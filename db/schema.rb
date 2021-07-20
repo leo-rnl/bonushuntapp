@@ -10,10 +10,58 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_20_112303) do
+ActiveRecord::Schema.define(version: 2021_07_20_114140) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "boards", force: :cascade do |t|
+    t.string "name"
+    t.string "devise"
+    t.integer "start_bet"
+    t.integer "bet"
+    t.bigint "user_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_boards_on_user_id"
+  end
+
+  create_table "hunt_lists", force: :cascade do |t|
+    t.integer "bet"
+    t.integer "earn"
+    t.integer "ratio"
+    t.bigint "board_id", null: false
+    t.bigint "machine_id", null: false
+    t.bigint "state_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["board_id"], name: "index_hunt_lists_on_board_id"
+    t.index ["machine_id"], name: "index_hunt_lists_on_machine_id"
+    t.index ["state_id"], name: "index_hunt_lists_on_state_id"
+  end
+
+  create_table "machines", force: :cascade do |t|
+    t.string "name"
+    t.integer "volatility"
+    t.string "article_url"
+    t.string "play_url"
+    t.bigint "provider_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["provider_id"], name: "index_machines_on_provider_id"
+  end
+
+  create_table "providers", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "states", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
 
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
@@ -27,4 +75,9 @@ ActiveRecord::Schema.define(version: 2021_07_20_112303) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "boards", "users"
+  add_foreign_key "hunt_lists", "boards"
+  add_foreign_key "hunt_lists", "machines"
+  add_foreign_key "hunt_lists", "states"
+  add_foreign_key "machines", "providers"
 end
